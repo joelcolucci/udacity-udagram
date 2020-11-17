@@ -31,11 +31,18 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
   //! END @TODO1
   app.get('/filteredimage', async (req, res, next) => {
-    const imageUrl = req.query.image_url;
+    const imageUrl: string = req.query.image_url;
 
-    const filteredImage = await filterImageFromURL(imageUrl)
+    if (!imageUrl) {
+      return res.status(400).send({ message: 'image_url is required' });
+    }
 
-    res.sendFile(filteredImage)
+    try {
+      const filteredImage: string = await filterImageFromURL(imageUrl);
+      res.sendFile(filteredImage);
+    } catch (error) {
+      res.status(422).send({ message: 'image unable to be processed' });
+    }
   });
   
   // Root Endpoint
@@ -47,7 +54,7 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
   // Start the Server
   app.listen( port, () => {
-      console.log( `server running http://localhost:${ port }` );
-      console.log( `press CTRL+C to stop server` );
+    console.log( `server running http://localhost:${ port }` );
+    console.log( `press CTRL+C to stop server` );
   } );
 })();
